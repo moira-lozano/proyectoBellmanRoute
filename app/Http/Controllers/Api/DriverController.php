@@ -58,7 +58,7 @@ class DriverController extends Controller
     public function show(Driver $driver): JsonResponse
     {
         try {
-            $drivers = $driver::with('city','user')->get();
+            $drivers = $driver::with('city','user')->orderBy('id', 'desc')->get();
             return response()->json([
                 'message' => 'Lista de ciudades',
                 'drivers' => $drivers

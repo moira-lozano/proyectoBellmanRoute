@@ -55,13 +55,13 @@ Route::get("/show-cities", [CityController::class, "show"]);
 Route::post("/store-drivers", [DriverController::class, "store"]);
 Route::get("/show-drivers", [DriverController::class, "show"]);
 Route::post("/update-drivers", [DriverController::class, "update"]);
-Route::get("/delete-drivers/{driver}", [DriverController::class, "destroy"]);
+Route::post("/delete-drivers/{driver}", [DriverController::class, "destroy"]);
 
 //CRUD :: CLIENTE
 Route::post("/store-customer", [CustomerController::class, "store"]);  /// probicional crea cliente y ubicacion
 Route::get("/show-customer", [CustomerController::class, "show"]);
 Route::post("/update-customer/{customer}", [CustomerController::class, "update"]);
-Route::get("/delete-customer/{customer}", [CustomerController::class, "destroy"]);
+Route::post("/delete-customer/{customer}", [CustomerController::class, "destroy"]);
 
 //CREACION DE UBICACIONES DEL CLIENTE
 Route::post("/store-address", [AddressController::class, "store"]);  /// probicional crea cliente y ubicacion
@@ -73,13 +73,13 @@ Route::get("/delete-address/{id_customer}", [AddressController::class, "destroy"
 Route::post("/store-vehicles", [VehicleController::class, "store"]);
 Route::get("/show-vehicles", [VehicleController::class, "show"]);
 Route::post("/update-vehicles/{vehicle}", [VehicleController::class, "update"]);
-Route::get("/delete-vehicles/{vehicle}", [VehicleController::class, "destroy"]);
+Route::post("/delete-vehicles/{vehicle}", [VehicleController::class, "destroy"]);
 
 // CRUD DE PRODUCTOS
 Route::post("/store-product", [ProductController::class, "store"]);
 Route::get("/show-product/{product}", [ProductController::class, "show"]);
 Route::post("/update-product/{product}", [ProductController::class, "update"]);
-Route::get("/delete-product/{product}", [ProductController::class, "destroy"]);
+Route::post("/delete-product/{product}", [ProductController::class, "destroy"]);
 Route::get("/index-product", [ProductController::class, "index"]);  //lista de todos los productos creados con su categoria
 
 //para las categorias

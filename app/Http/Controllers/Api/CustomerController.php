@@ -89,7 +89,7 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         try {
-            $customers = $customer::with('city')->get();
+            $customers = $customer::with('city')->orderBy('id', 'desc')->get();
             return response()->json([
                 'customers' => $customers]);
         } catch (\Exception $e) {

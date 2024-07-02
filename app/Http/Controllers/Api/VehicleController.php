@@ -85,7 +85,7 @@ class VehicleController extends Controller
         // Obtener todos los vehículos registrados
         try {
             // Obtener todos los productos con sus categorías
-            $vehicles = $vehicle::all();
+            $vehicles = $vehicle::orderBy('id', 'desc')->get();
 
            /*  $vehicles->each(function($vehicle) {
                 $vehicle->photo = $vehicle->photo ? asset('storage/' . $vehicle->photo) : null;
@@ -174,8 +174,10 @@ class VehicleController extends Controller
     public function destroy(Vehicle $vehicle)
     {
         $vehicle->delete();
-        return $this->success(
-            __("Se eliminó correctamente"),
-        );
+
+        // Retornar una respuesta con el mensaje de eliminación
+        return response()->json([
+            'message' => 'Vehículo eliminado correctamente'
+        ]);
     }
 }
