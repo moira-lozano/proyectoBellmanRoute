@@ -206,11 +206,10 @@ export default {
       try {
         let res = await axios
           .post(`/update-customer/${this.formData.id}`, {
-            //id_customer: this.formData.id_customer,
+            id_customer: this.formData.id,
             username: this.formData.username,
             phone: this.formData.phone,
             email: this.formData.email,
-            //id_user: this.formData.user_id,
             id_cities: this.formData.city_id,
             password: this.formData.password
 
@@ -266,11 +265,11 @@ export default {
         }
       }
     },
-    name_city(city){
+  /*   name_city(city){
       if (city === null || city === '' || city === undefined) {
         return 'Sin registro de ciudad';
       }
-    },
+    }, */
     cancel() {
       this.stateForm = 0;
     },

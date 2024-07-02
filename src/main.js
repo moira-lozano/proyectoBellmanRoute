@@ -23,7 +23,7 @@ import axios from "axios";
 import ToastPlugin from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-bootstrap.css";
 
-axios.defaults.baseURL = "http://54.89.151.2/api";
+axios.defaults.baseURL = "http://192.168.0.8:8000/api";
 // Añadir script de Google Maps de manera correcta
 const script = document.createElement('script');
 script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyABHJaLOgaxiB3mVzOaJpMd8VDDgxfCBHE`;

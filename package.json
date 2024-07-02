@@ -27,7 +27,8 @@
     "vue-router": "3.0.1",
     "vue-toast-notification": "^1.0.1",
     "vue2-leaflet": "^2.7.1",
-    "vuex2": "^1.0.10"
+    "vuex2": "^1.0.10",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "3.12.1",
