@@ -110,17 +110,6 @@ class OrderDetailController extends Controller
         }
     }
     
-    
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\OrderDetail  $orderDetail
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(OrderDetail $orderDetail)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -129,10 +118,74 @@ class OrderDetailController extends Controller
      * @param  \App\Models\OrderDetail  $orderDetail
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, OrderDetail $orderDetail)
+    public function updateDetails(Request $request, $order_id)
     {
-        //
+        try {
+            // Verifica que el orden exista
+            $order = Order::findOrFail($order_id);
+    
+            // Inicializa el total de la orden
+            $totalOrder = 0;
+    
+            // Verifica que se reciban los datos de productos
+            $products = $request->input('products');
+            if (is_null($products) || !is_array($products)) {
+                return response()->json(['error' => 'No se recibieron datos de productos válidos.'], 400);
+            }
+    
+            foreach ($products as $productData) {
+                $product_id = $productData['product_id'];
+                $count = $productData['count'];
+    
+                // Verifica que el producto y la cantidad sean válidos
+                if (is_null($product_id) || is_null($count) || !is_numeric($count)) {
+                    continue; // Saltar a la siguiente iteración si los datos no son válidos
+                }
+    
+                // Obtener el precio del producto desde la base de datos
+                $productModel = Product::findOrFail($product_id);
+                $unitPrice = $productModel->price;
+    
+                $subtotal = $unitPrice * $count; // Calcular el subtotal correctamente
+    
+                $orderDetail = OrderDetail::where('order_id', $order_id)
+                                          ->where('product_id', $product_id)
+                                          ->first();
+    
+                if ($orderDetail) {
+                    // Actualiza el detalle existente
+                    $orderDetail->count = $count;
+                    $orderDetail->unit_price = $unitPrice;
+                    $orderDetail->total = $subtotal;
+                    $orderDetail->save();
+                } else {
+                    // Crea un nuevo detalle
+                    OrderDetail::create([
+                        'order_id' => $order->id, // Asegúrate de pasar el ID del orden y no el objeto completo
+                        'product_id' => $product_id,
+                        'count' => $count,
+                        'unit_price' => $unitPrice,
+                        'total' => $subtotal,
+                    ]);
+                }
+    
+                // Sumar al total de la orden
+                $totalOrder += $subtotal;
+            }
+    
+            // Actualizar el total de la orden
+            $order->total = $totalOrder;
+            $order->save();
+    
+            return response()->json(['message' => 'Detalles de la orden actualizados exitosamente.']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'Ocurrió un error al actualizar los detalles de la orden.'], 500);
+        }
     }
+    
+    
+    
+    
 
     /**
      * Remove the specified resource from storage.

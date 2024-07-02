@@ -28,6 +28,7 @@ class Order extends Model
      {
          return $this->hasMany(OrderDetail::class);
      }
+     
      public function order_driver()
      {
          return $this->belongsTo(OrderDriver::class);

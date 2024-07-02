@@ -47,7 +47,9 @@ Route::post("/signup-customer", [AuthController::class, "signupCustomer"]); // c
 Route::post("/logout", [AuthController::class, "logout"]); // crear usuario
 
 
+////MOSTRAR LAS CIUDADES 
 Route::get("/show-cities", [CityController::class, "show"]);
+
 
 //CRUD:: TRANPORTISTAS
 Route::post("/store-drivers", [DriverController::class, "store"]);
@@ -83,8 +85,6 @@ Route::get("/index-product", [ProductController::class, "index"]);  //lista de t
 //para las categorias
 Route::get("/show-categories", [CategoryController::class, "show"]);
 
-//para los detalles de la orden
-Route::get("/show-details/{id}", [OrderDetailController::class, "show"]);
 
 //para las ordenes
 Route::get("/show-order", [OrderController::class, "showOrder"]);
@@ -93,17 +93,18 @@ Route::post("/update-order/{id}", [OrderController::class, "update"]);
 Route::get("/delete-order/{id}", [OrderController::class, "destroy"]);
 Route::post('orders/{order}/assign-driver-vehicle', [OrderController::class, 'assignDriverAndVehicle']);
 
-//para los detalles
+//para los detalles de la orden
+Route::get("/show-details/{id}", [OrderDetailController::class, "show"]);
 Route::post('/store-orders-details', [OrderDetailController::class, 'store']);
+Route::post('/update-orders-details/{order_id}', [OrderDetailController::class, 'updateDetails']);
 Route::get("/show-orders-details/{orderDetail}", [OrderDetailController::class, "showOrderDetails"]);
 
-
+/// para el delivery
 Route::post('delivery/{order}/register-delivery', [DeliveryController::class, 'registerDelivery']);
+Route::get("/listar-delivery", [DeliveryController::class, "listarDelivery"]);
 
 Route::get("/vehiculo-disponible", [VehicleController::class, "getVehiculosDisponibles"]);
 Route::get("/chofer-disponible", [DriverController::class, "getAvailableDrivers"]);
-
-Route::get("/listar-delivery", [DeliveryController::class, "listarDelivery"]);
 
 
 

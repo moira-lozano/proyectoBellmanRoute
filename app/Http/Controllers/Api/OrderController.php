@@ -145,16 +145,15 @@ class OrderController extends Controller
      * @param  \App\Models\Order  $order
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
+    public function update(Request $request, $id) {
+
+      /*   $request->validate([
             'date' => 'required|string',
             'state' => 'required|string',
-            //'total' => 'required|string',
             'latitud' => 'required|string',
             'longitud' => 'required|string',
             'customer_id' => 'required|integer',
-        ]);
+        ]); */
 
 
         try {
@@ -163,7 +162,7 @@ class OrderController extends Controller
 
             // Retornar una respuesta con el producto actualizado
             return response()->json([
-                'message' => 'Producto actualizado correctamente',
+                'message' => ' Orden actualizada correctamente',
                 'order' => $order
             ]);
         } catch (\Exception $e) {

@@ -19,7 +19,7 @@ class OrderDetail extends Model
      // relacion de una ciudad a muchos ordenes
      public function order()
      {
-         return $this->belongsTo(Order::class,'order_id');
+         return $this->belongsTo(Order::class);
      }
 
      public function product()
