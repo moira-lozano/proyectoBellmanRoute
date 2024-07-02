@@ -13,7 +13,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item, index) in vehicles" :key="index">
+                  <tr v-for="(item, index) in paginatedVehicles" :key="index">
                     <td>{{ item.id }}</td>
                     <td>{{ item.plate }}</td>
                     <td>{{ item.model }}</td>
@@ -26,13 +26,31 @@
                     <td>{{ item.state }}</td>
                     <td>
                       <button class="btn btn-outline-warning" type="button" @click="edit(item)">Editar</button>
-                      <button class="btn btn-outline-danger" type="button" @click="eliminarItem(item.id)">Eliminar</button>
+                      <button class="btn btn-outline-danger" type="button" @click="deleteItem(item.id)">Eliminar</button>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </card>
+          <!-- Agregar controles de paginación -->
+           <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+                  <a class="page-link" href="#" aria-label="Previous" @click.prevent="prevPage">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item" v-for="page in paginatedPages" :key="page" :class="{ 'active': currentPage === page }">
+                  <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                </li>
+                <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+                  <a class="page-link" href="#" aria-label="Next" @click.prevent="nextPage">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
         </div>
       </template>
 
@@ -83,16 +101,24 @@
         </template>
       </form>
     </div>
+    <b-modal id="confirmDeleteModal" @ok="confirmDelete" title="Confirmar eliminación">
+      ¿Estás seguro de que deseas eliminar este vehículo?
+    </b-modal>
   </div>
 </template>
 
 <script>
 import { PaperTable } from "@/components";
 import axios from "axios";
+import { BModal } from 'bootstrap-vue';
 
 const tableColumns = ["#", "Nro de Placa", "Modelo", "Marca", "Capacidad", "Estado", "Opciones"];
+const pageSize = 10; // Tamaño de página, ajusta según lo necesario
 
 export default {
+  components: {
+    BModal
+  },
   name: "Table-userDriver",
   props: {
     type: {
@@ -122,12 +148,30 @@ export default {
         ability: "",
         //photo: null,
         state: "",
-      }
+      },
+      vehicleToDelete: null,
+      currentPage: 1, // Página actual
     };
   },
   computed: {
     tableClass() {
       return `table-${this.type}`;
+    },
+    paginatedVehicles() {
+      const startIndex = (this.currentPage - 1) * pageSize;
+      return this.vehicles.slice(startIndex, startIndex + pageSize);
+    },
+    totalPages() {
+      return Math.ceil(this.vehicles.length / pageSize);
+    },
+    paginatedPages() {
+      let pages = [];
+      let startPage = Math.floor((this.currentPage - 1) / 10) * 10 + 1;
+      let endPage = Math.min(startPage + 9, this.totalPages);
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      return pages;
     },
   },
   methods: {
@@ -149,6 +193,22 @@ export default {
       this.stateForm = 1;
       this.openForm('vehicle', 'store');
     },
+
+    deleteItem(itemId) {
+      this.vehicleToDelete = itemId;
+      this.$bvModal.show('confirmDeleteModal');
+    },
+
+    async confirmDelete() {
+      try {
+        let res = await axios.post(`/delete-vehicles/${this.vehicleToDelete}`);
+        this.$toast.success(res.data.message);
+        this.getVehicle();
+      } catch (error) {
+        this.$toast.error('Error al eliminar el vehículo.');
+      }
+    },
+
     async store_vehicle() {
       try {
         let formData = new FormData();
@@ -231,6 +291,19 @@ export default {
     cancel() {
       this.stateForm = 0;
     },
+    changePage(page) {
+      this.currentPage = page;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    }
   },
   mounted() {
     this.getVehicle();

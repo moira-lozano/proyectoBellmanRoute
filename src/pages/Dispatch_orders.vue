@@ -544,9 +544,7 @@ export default {
     cancel() {
       this.stateForm = 0;
     },
-    eliminarItem(id) {
-      // Implementa la lógica para eliminar el ítem
-    },
+   
     changePage(page) {
       this.currentPage = page;
     },

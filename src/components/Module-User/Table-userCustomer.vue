@@ -13,7 +13,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item, index) in customers" :key="index">
+                  <tr v-for="(item, index) in paginatedCustomer" :key="index">
                     <td>{{ item.id }}</td>
                     <td>{{ item.nombre }}</td>
                     <td>{{ item.phone }}</td>
@@ -31,9 +31,26 @@
               </table>
             </div>
           </card>
+          <!-- Agregar controles de paginación -->
+          <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+                  <a class="page-link" href="#" aria-label="Previous" @click.prevent="prevPage">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item" v-for="page in paginatedPages" :key="page" :class="{ 'active': currentPage === page }">
+                  <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                </li>
+                <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+                  <a class="page-link" href="#" aria-label="Next" @click.prevent="nextPage">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
         </div>
       </template>
-
 
       <form class="row g-3">
           <template v-if="stateForm === 1 || stateForm === 2">
@@ -86,6 +103,9 @@
           </template>
       </form>
     </div>
+    <b-modal id="confirmDeleteModal" @ok="confirmDelete" title="Confirmar eliminación">
+      ¿Estás seguro de que deseas eliminar este cliente?
+    </b-modal>
   </div>
 </template>
 
@@ -95,10 +115,16 @@
 //import { PaperTable } from "@/components";
 import axios from "axios";
 import toast from "vue-toast-notification";
+import { BModal } from 'bootstrap-vue';
 
 const tableColumns = ["#", "Nombre", "Teléfono", "Correo", "Ciudad", "Opciones"];
+const pageSize = 10; // Tamaño de página, ajusta según lo necesario
+
 
 export default {
+  components: {
+    BModal
+  },
   name: "Table-userCustomer",
   props: {
     type: {
@@ -135,12 +161,30 @@ export default {
         id_customer: 0,
         username: "",
         password: "",
-      }
+      },
+      clienteToDelete: null,
+      currentPage: 1, // Página actual
     };
   },
   computed: {
     tableClass() {
       return `table-${this.type}`;
+    },
+    paginatedCustomer() {
+      const startIndex = (this.currentPage - 1) * pageSize;
+      return this.customers.slice(startIndex, startIndex + pageSize);
+    },
+    totalPages() {
+      return Math.ceil(this.customers.length / pageSize);
+    },
+    paginatedPages() {
+      let pages = [];
+      let startPage = Math.floor((this.currentPage - 1) / 10) * 10 + 1;
+      let endPage = Math.min(startPage + 9, this.totalPages);
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+      return pages;
     },
   },
   methods: {
@@ -183,6 +227,22 @@ export default {
       this.stateForm = 1,
         this.openForm('customer', 'store');
     },
+
+    eliminarItem(itemId){
+      this.clienteToDelete = itemId;
+      this.$bvModal.show('confirmDeleteModal');
+    },
+
+    async confirmDelete() {
+      try {
+        let res = await axios.post(`/delete-customer/${this.clienteToDelete}`);
+        this.$toast.success(res.data.message);
+        this.getCustomer();
+      } catch (error) {
+        this.$toast.error('Error al eliminar el cliente.');
+      }
+    },
+
     async store_customer() {
       try {
         let res = await axios
@@ -265,14 +325,22 @@ export default {
         }
       }
     },
-  /*   name_city(city){
-      if (city === null || city === '' || city === undefined) {
-        return 'Sin registro de ciudad';
-      }
-    }, */
     cancel() {
       this.stateForm = 0;
     },
+    changePage(page) {
+      this.currentPage = page;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    }
   },
   mounted() {
     this.getCustomer();
